@@ -2,10 +2,26 @@ pipeline {
     agent any
 
     stages {
-        stage('Test') {
+        stage('Code Inspection') {
             steps {
-                bat 'echo "Ah Velha!!!!"';
-            }
+				/*
+				bat '''	copy D:\\temp\\github\\selo\\* .
+						sonar-scanner.bat -Dsonar.projectKey=selo -Dsonar.organization=danielgjacobsen-github -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=c5e362895f82d0c8f45047d11b8c74186f320e5b''';
+				*/
+				// requires SonarQube Scanner 2.8+
+				script{
+					def scannerHome = tool 'sonarScanner';
+					withSonarQubeEnv('sonarServer') {
+						bat '''	copy D:\\temp\\github\\selo\\* .
+								sonar-scanner.bat -Dsonar.projectKey=selo -Dsonar.organization=danielgjacobsen-github -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=c5e362895f82d0c8f45047d11b8c74186f320e5b''';
+					}
+				}
+            } 
         }
     }
+	post{
+		always{
+			deleteDir();
+		}
+	}
 }
